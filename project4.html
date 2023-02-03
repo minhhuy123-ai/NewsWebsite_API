@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="Style.css">
+</head>
+<body >
+    <!--Hieu ung load-->
+    <div class="loader">
+        <span  class="fas fa-spinner xoay icon"></span>
+    </div>
+
+    <div id="myOverlay" class="overlay">
+        <span class="closebtn" title="Close Overlay">x</span>
+        <div class="overlay-content">
+            <form action="#">
+                <input id = "search" type="text" placeholder="Search..." name="search">
+                <button id = "searchBtn" type="button"><i class="fa fa-search"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <header>
+        <h1>My News <a href="#"><i class="fa fa-search" id="openBtn"></i></a></i></h1>
+    </header>
+    
+    <div class="container-fluid" id="news-list">
+        
+    </div>
+
+    <script>
+        //hiệu ứng load mỗi khi refresh lại trang
+        $(window).on('load', function(event){ 
+            $('.loader').delay(1000).fadeOut('fast');
+        });
+
+
+        $(document).ready(function(){
+            var key = "d40aea0b9ae090400bb176dbe0f9210b";
+            var url = "https://gnews.io/api/v4/top-headlines?token=" + key;
+
+            //Hiển thị top headline news
+            $.getJSON(url, function(data){
+                console.log(data);
+                var result1 = '';
+                //format cách thức hiển thị
+                $.each(data.articles, function(key, value){
+                    result1+= `
+                    <div class="row">
+                        <div class="col-md-4 news-image">
+                            <img src="${value.image}" alt="Image broken">
+                        </div>
+                        <div class="col-md-8">
+                            <h2><a target="_blank" href="${value.url}">${value.title}</a></h2>
+                            <p><i>${value.publishedAt}</i></p>
+                            <p>${value.description}</p>
+                        </div>
+                    </div>`;
+                });
+                //render lên html
+                $('#news-list').append(result1);
+            });
+
+            $('#searchBtn').click(function(){
+
+                $('.loader').show();
+
+                //từ khóa cần search
+                var keyword = $('#search').val();
+                //link url tương ứng từ khóa cần search
+                var urlSearch = "https://gnews.io/api/v4/search?token=" + key + "&q=" + keyword + "&lang=en";
+                
+                $.getJSON(urlSearch, function(data){
+                    $('.loader').hide();
+                    console.log(data);
+                    var result2 = '';
+                    //format cách thức hiển thị
+                    $.each(data.articles, function(key, value){
+                    result2+= `
+                    <div class="row">
+                        <div class="col-md-4 news-image">
+                            <img src="${value.image}" alt="Image broken">
+                        </div>
+                        <div class="col-md-8">
+                            <h2><a target="_blank" href="${value.url}">${value.title}</a></h2>
+                            <p><i>${value.publishedAt}</i></p>
+                            <p>${value.description}</p>
+                        </div>
+                    </div>`;
+                });
+                //render lên html
+                $('#news-list').empty();
+                $('#news-list').append(result2);
+                });
+                
+                //ẩn hộp thoại sau khi đã search
+                $('#myOverlay').hide();
+            });
+
+            //khi click vào biểu tượng thì màn hình search-box hiển thị
+            $('#openBtn').click(function(){
+                $('#myOverlay').show();
+            })
+            //khi click vào dấu (X) thì màn hình search-box biến mất
+            $('.closebtn').click(function(){
+                $('#myOverlay').hide();
+            })
+        });
+
+    </script>
+
+</body>
+</html>
